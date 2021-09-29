@@ -85,6 +85,7 @@ class handDetector():
         for id in range(0, 5):
             dist.append(l2_dist(self.lmList[self.tipIds[id]][1], self.lmList[self.tipIds[id]][2],  self.lmList[0][1], self.lmList[0][2]))
         if np.max(dist) == dist[1]:
+            print(len(self.lmList))
             return True
         else:
             return False

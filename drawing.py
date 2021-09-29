@@ -46,16 +46,16 @@ while True:
         
                 # 4. If Selection Mode - Two finger are up
                 if fingers[1] and fingers[2] and fingers[3] and fingers[4]:
-                    # xp, yp = 0, 0
-                    imgCanvas = np.zeros((480, 640, 3), np.uint8)
+                    xp, yp = 0, 0
                 # 5. If Drawing Mode - Index finger is up
 
-                if fingers[1]==0 and fingers[2]==0 and fingers[3]==0 and fingers[4]==0:
+                elif fingers[1]==0 and fingers[2]==0 and fingers[3]==0 and fingers[4]==0:
                     xp, yp = 0, 0
+                    imgCanvas = np.zeros((480, 640, 3), np.uint8)
                 
-                if checkDraw:
+                elif checkDraw:
                     cv2.circle(img, (x1, y1), 15, drawColor, cv2.FILLED)
-                    print("Drawing Mode")
+                    # print("Drawing Mode")
                     if xp == 0 and yp == 0:
                         xp, yp = x1, y1
                     # print(xp,yp,x1,y1)
@@ -87,6 +87,7 @@ while True:
             # Optionally stack both frames and show it.
             stacked = np.hstack((imgCanvas,img))
             cv2.imshow('Trackbars',cv2.resize(stacked,None,fx=0.6,fy=0.6))
+            
             cv2.imshow("Image", img)
             # Setting the header image
             # img = cv2.addWeighted(img,0.5,imgCanvas,0.5,0)
