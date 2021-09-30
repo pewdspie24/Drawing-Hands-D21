@@ -1,9 +1,9 @@
 import cv2
 import numpy as np
-import time
-import os
 import module as htm
 import streamlit as st
+from streamlit_webrtc import VideoTransformerBase, webrtc_streamer
+
 
 st.title("Hehe")
 run = st.checkbox('Run')
@@ -15,18 +15,14 @@ drawColor = (255, 0, 255)
 ########################
  
 drawColor = (255, 0, 255)
- 
-cap = cv2.VideoCapture(0)
-cap.set(3, 640)
-cap.set(4, 480)
- 
+
 detector = htm.handDetector(detectionCon=0.65,maxHands=1)
 xp, yp = 0, 0
 imgCanvas = np.zeros((480, 640, 3), np.uint8)
+class VideoTransformer(VideoTransformerBase):
+    def transform(self, frame):
+        img = frame.to_ndarray(format="bgr24")
 
-while run:
-    success, img = cap.read()
-    if success:
         try:
             img = cv2.flip(img, 1)
         
@@ -87,13 +83,16 @@ while run:
             img = cv2.add(img,imgCanvas)
             
             # Optionally stack both frames and show it.
-            stacked = np.hstack((imgCanvas,img))
+            # stacked = np.hstack((imgCanvas,img))
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            FRAME_WINDOW.image(img)
+            # FRAME_WINDOW.image(img)
             # cv2.imshow('Trackbars',cv2.resize(stacked,None,fx=0.6,fy=0.6))
             # cv2.imshow("Image", img)
         except:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            FRAME_WINDOW.image(img)
-else:
-    st.write("Stopped")
+            # FRAME_WINDOW.image(img)
+
+        return img
+ 
+webrtc_streamer(key="example", video_transformer_factory=VideoTransformer)
+
