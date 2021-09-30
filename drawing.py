@@ -8,18 +8,28 @@ import module as htm
 brushThickness = 10
 eraserThickness = 100
 drawColor = (255, 0, 255)
+headerColor = (255,0,255)
 ########################
  
 drawColor = (255, 0, 255)
  
+WINDOW_SIZE = (480, 640, 3)
+HEADER_SIZE = (int(WINDOW_SIZE[1]), int(WINDOW_SIZE[0]/20))
 cap = cv2.VideoCapture(0)
 cap.set(3, 640)
 cap.set(4, 480)
  
 detector = htm.handDetector(detectionCon=0.65,maxHands=1)
 xp, yp = 0, 0
-imgCanvas = np.zeros((480, 640, 3), np.uint8)
- 
+imgCanvas = np.zeros(WINDOW_SIZE, np.uint8)
+# print(WINDOW_SIZE[:-1]/4)
+header = np.zeros(WINDOW_SIZE, np.uint8)
+header[:] = headerColor
+header = cv2.resize(header, HEADER_SIZE)
+print(HEADER_SIZE)
+print(WINDOW_SIZE[0]-HEADER_SIZE[1], WINDOW_SIZE[1]-HEADER_SIZE[0])
+print(header.shape)
+# img[(WINDOW_SIZE[1]-HEADER_SIZE[0]):HEADER_SIZE[1], (WINDOW_SIZE[1]-HEADER_SIZE[0]):WINDOW_SIZE[1]] = header
 while True:
  
     # 1. Import image
@@ -27,15 +37,17 @@ while True:
     if success:
         try:
             img = cv2.flip(img, 1)
-        
+            
+            # header = np.zeros((480, 640, 3), np.uint8)
             # 2. Find Hand Landmarks
             img = detector.findHands(img)
             
             lmList = detector.findPosition(img, draw=False)
             # print(len(lmList[0]))
+
             if len(lmList) != 0:
                 # print(lmList[0])
-        
+                
                 # tip of index and middle fingers
                 x1, y1 = lmList[0][8][1:]
                 x2, y2 = lmList[0][12][1:]
@@ -47,11 +59,27 @@ while True:
                 # 4. If Selection Mode - Two finger are up
                 if fingers[1] and fingers[2] and fingers[3] and fingers[4]:
                     xp, yp = 0, 0
+                    imgCanvas = np.zeros((480, 640, 3), np.uint8)
                 # 5. If Drawing Mode - Index finger is up
 
                 elif fingers[1]==0 and fingers[2]==0 and fingers[3]==0 and fingers[4]==0:
                     xp, yp = 0, 0
-                    imgCanvas = np.zeros((480, 640, 3), np.uint8)
+                    
+                
+                # elif fingers[1] and fingers[2]:
+                #         if y1 < 125:
+                #             if 250 < x1 < 450:
+                #                 header = overlayList&#91;0]
+                #                 drawColor = (255, 0, 255)
+                #             elif 550 < x1 < 750:
+                #                 header = overlayList&#91;1]
+                #                 drawColor = (255, 0, 0)
+                #             elif 800 < x1 < 950:
+                #                 header = overlayList&#91;2]
+                #                 drawColor = (0, 255, 0)
+                #             elif 1050 < x1 < 1200:
+                #                 header = overlayList&#91;3]
+                #                 drawColor = (0, 0, 0)
                 
                 elif checkDraw:
                     cv2.circle(img, (x1, y1), 15, drawColor, cv2.FILLED)
@@ -81,13 +109,12 @@ while True:
             # imgInv = cv2.cvtColor(imgInv,cv2.COLOR_GRAY2BGR)
             # img = cv2.bitwise_and(img,imgInv)
             # img = cv2.bitwise_or(img,imgCanvas)
-
             img = cv2.add(img,imgCanvas)
-    
+            
             # Optionally stack both frames and show it.
             stacked = np.hstack((imgCanvas,img))
             cv2.imshow('Trackbars',cv2.resize(stacked,None,fx=0.6,fy=0.6))
-            
+            img[(WINDOW_SIZE[1]-HEADER_SIZE[0]):HEADER_SIZE[1], (WINDOW_SIZE[1]-HEADER_SIZE[0]):WINDOW_SIZE[1]] = header
             cv2.imshow("Image", img)
             # Setting the header image
             # img = cv2.addWeighted(img,0.5,imgCanvas,0.5,0)
@@ -95,6 +122,7 @@ while True:
             # cv2.imshow("Canvas", imgCanvas)
         except:
             print("",end="")
+            img[(WINDOW_SIZE[1]-HEADER_SIZE[0]):HEADER_SIZE[1], (WINDOW_SIZE[1]-HEADER_SIZE[0]):WINDOW_SIZE[1]] = header
             cv2.imshow("Image", img)
     if cv2.waitKey(1)&0xFF == 27:
         break
