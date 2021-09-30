@@ -93,6 +93,7 @@ class OpenCVVideoProcessor(VideoProcessorBase):
             # cv2.imshow('Trackbars',cv2.resize(stacked,None,fx=0.6,fy=0.6))
             # cv2.imshow("Image", img)
         except:
+            print("hell")
             return av.VideoFrame.from_ndarray(img, format="bgr24")
             # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             # FRAME_WINDOW.image(img)
