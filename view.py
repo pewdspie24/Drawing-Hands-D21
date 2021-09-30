@@ -85,7 +85,7 @@ class OpenCVVideoProcessor(VideoProcessorBase):
             # img = cv2.bitwise_or(img,imgCanvas)
 
             img = cv2.add(img,imgCanvas)
-            return av.VideoFrame.from_ndarray(img, format="bgr24")
+            return av.VideoFrame.from_ndarray(imgCanvas, format="bgr24")
             # Optionally stack both frames and show it.
             # stacked = np.hstack((imgCanvas,img))
             # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -106,10 +106,7 @@ webrtc_ctx = webrtc_streamer(
         async_processing=True,
     )
 
-if webrtc_ctx.video_processor:
-        webrtc_ctx.video_processor.type = st.radio(
-            "Select transform type", ("noop", "cartoon", "edges", "rotate")
-        )
+
 
 # class OpenCVVideoProcessor(VideoProcessorBase):
 #     def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
