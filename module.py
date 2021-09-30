@@ -71,7 +71,7 @@ class handDetector():
     
         # Fingers
         for id in range(1, 5):
-            if self.lmList[self.tipIds[id]][2] < self.lmList[self.tipIds[id] - 2][2]:
+            if self.lmList[self.tipIds[id]][2] < self.lmList[self.tipIds[id] - 2][2] :
                 fingers.append(1)
             else:
                 fingers.append(0)
@@ -79,7 +79,17 @@ class handDetector():
             # totalFingers = fingers.count(1)
     
         return fingers
-    
+
+    def checkErase(self):
+        count=0
+        for id in range(1, 5):
+            if self.lmList[self.tipIds[id]][2] > self.lmList[0][2] :
+                count+=1
+        if count == 4:
+            return True
+        else:
+            return False
+
     def checkDraw(self):
         dist = []
         for id in range(0, 5):

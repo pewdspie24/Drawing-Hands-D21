@@ -8,7 +8,7 @@ import module as htm
 brushThickness = 10
 eraserThickness = 100
 drawColor = (255, 0, 255)
-headerColor = (255,0,255)
+headerColor = [(255,0,255), (255,255,0), (0,255,255), (0,0,0)]
 ########################
  
 drawColor = (255, 0, 255)
@@ -24,7 +24,12 @@ xp, yp = 0, 0
 imgCanvas = np.zeros(WINDOW_SIZE, np.uint8)
 # print(WINDOW_SIZE[:-1]/4)
 header = np.zeros(WINDOW_SIZE, np.uint8)
-header[:] = headerColor
+header[:] = headerColor[1]
+print(header.shape)
+header[0:WINDOW_SIZE[0], 0:(WINDOW_SIZE[1]//4)] = headerColor[0]
+header[0:WINDOW_SIZE[0], (WINDOW_SIZE[1]//4):(WINDOW_SIZE[1]//2)] = headerColor[1]
+header[0:WINDOW_SIZE[0], (WINDOW_SIZE[1]//2):(WINDOW_SIZE[1]//4*3)] = headerColor[2]
+header[0:WINDOW_SIZE[0], (WINDOW_SIZE[1]//4*3):(WINDOW_SIZE[1])] = headerColor[3]
 header = cv2.resize(header, HEADER_SIZE)
 print(HEADER_SIZE)
 print(WINDOW_SIZE[0]-HEADER_SIZE[1], WINDOW_SIZE[1]-HEADER_SIZE[0])
@@ -50,36 +55,36 @@ while True:
                 
                 # tip of index and middle fingers
                 x1, y1 = lmList[0][8][1:]
-                x2, y2 = lmList[0][12][1:]
+                x2, y2 = lmList[0][4][1:]
                 # print("cc")
                 # 3. Check which fingers are up
                 fingers = detector.fingersUp()
                 checkDraw = detector.checkDraw()
-        
+                checkErase = detector.checkErase()
+                print(fingers)
                 # 4. If Selection Mode - Two finger are up
-                if fingers[1] and fingers[2] and fingers[3] and fingers[4]:
+                if fingers[1]==1 and fingers[2]==1 and fingers[3]==1 and fingers[4]==1:
                     xp, yp = 0, 0
-                    imgCanvas = np.zeros((480, 640, 3), np.uint8)
                 # 5. If Drawing Mode - Index finger is up
 
-                elif fingers[1]==0 and fingers[2]==0 and fingers[3]==0 and fingers[4]==0:
+                elif checkErase:
                     xp, yp = 0, 0
+                    # print("cc")
+                    imgCanvas = np.zeros(WINDOW_SIZE, np.uint8)
                     
-                
-                # elif fingers[1] and fingers[2]:
-                #         if y1 < 125:
-                #             if 250 < x1 < 450:
-                #                 header = overlayList&#91;0]
-                #                 drawColor = (255, 0, 255)
-                #             elif 550 < x1 < 750:
-                #                 header = overlayList&#91;1]
-                #                 drawColor = (255, 0, 0)
-                #             elif 800 < x1 < 950:
-                #                 header = overlayList&#91;2]
-                #                 drawColor = (0, 255, 0)
-                #             elif 1050 < x1 < 1200:
-                #                 header = overlayList&#91;3]
-                #                 drawColor = (0, 0, 0)
+                elif fingers[0] == 0 and fingers[1]:
+                    cv2.rectangle(img, (x1, y1 - 25), (x2, y2 + 25), drawColor, cv2.FILLED)
+
+                elif fingers[1] and fingers[2]:
+                        if y1 < HEADER_SIZE[1]:
+                            if 0 < x1 < WINDOW_SIZE[1]//4:
+                                drawColor = headerColor[0]
+                            elif WINDOW_SIZE[1]//4 < x1 < WINDOW_SIZE[1]//2:
+                                drawColor = headerColor[1]
+                            elif WINDOW_SIZE[1]//2 < x1 < WINDOW_SIZE[1]//4*3:
+                                drawColor = headerColor[2]
+                            elif WINDOW_SIZE[1]//4*3 < x1 < WINDOW_SIZE[1]:
+                                drawColor = headerColor[3]
                 
                 elif checkDraw:
                     cv2.circle(img, (x1, y1), 15, drawColor, cv2.FILLED)
